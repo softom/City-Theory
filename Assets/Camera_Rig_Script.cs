@@ -4,20 +4,22 @@ using UnityEngine;
 
 public class Camera_Rig_Script : MonoBehaviour
 {
-    public float moveTime;
-    public float moveSpeed;
+    public float moveTime = 10f;
+    public float moveSpeed = 0.1f;
     public Vector3 newPosition;
     public Vector3 cameraPosition;
     public Camera cameraToWork;
     private Transform cameraTransform;
     
-    public float rotationSpeed;
+    public float rotationSpeed = 1f;
     public Quaternion rotationCamera;
     public Vector3 zoomAmmount;
-    public float zoomMultiplay;
+    public float zoomMultiplay = 0.2f;
 
     public Vector3 currentMouseClick;
     public Vector3 clickMousePossition;
+
+    public float mouseScrollSpeed = 1f;
     
     // Start is called before the first frame update
     void Start()
@@ -42,9 +44,13 @@ public class Camera_Rig_Script : MonoBehaviour
 
     public void HandleMouse()
     {
-        if (Input.mouseScrollDelta.y != 0)
+        float mouseScroll = Input.mouseScrollDelta.y;
+        
+        if (mouseScroll != 0)
         {
-            
+            cameraPosition += zoomAmmount*mouseScroll*mouseScrollSpeed;
+            cameraToWork.transform.localPosition = cameraPosition;
+            //cameraToWork.transform.localPosition = Vector3.Lerp(cameraToWork.transform.localPosition, cameraPosition, Time.deltaTime * moveTime);   
         }
 
         if (Input.GetMouseButtonDown(0))
@@ -54,7 +60,7 @@ public class Camera_Rig_Script : MonoBehaviour
             Debug.DrawRay(Vector3.zero, Vector3.right, Color.green, 30);
             Debug.DrawRay(Vector3.zero, Vector3.forward, Color.green, 30);
             Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Debug.DrawLine(cameraRay.origin, cameraRay.direction, Color.red, 30f);
+            
             Debug.DrawRay(cameraRay.origin, cameraRay.direction, Color.blue, 30f);
             //Debug.
 
@@ -64,21 +70,22 @@ public class Camera_Rig_Script : MonoBehaviour
             if (mousePlane.Raycast(cameraRay, out entery))
             {
                 clickMousePossition = cameraRay.GetPoint(entery);
+                Debug.DrawLine(cameraRay.origin, clickMousePossition, Color.red, 30f);
             }
         }
 
         if (Input.GetMouseButton(0))
         {
                 Plane mousePlane = new Plane(Vector3.up, Vector3.zero);
-                
                 Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
-                
                 float entery;
+
                 if (mousePlane.Raycast(cameraRay, out entery))
                 {
                     currentMouseClick = cameraRay.GetPoint(entery);
-                    newPosition = transform.position + clickMousePossition - currentMouseClick;
-
+                    Vector3 newMousePosition = transform.position + clickMousePossition - currentMouseClick;
+                    transform.position = newMousePosition;
+                    newPosition = newMousePosition;
                 }
         }
     }

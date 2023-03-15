@@ -134,11 +134,11 @@ GameObject:
   - component: {fileID: 330585547}
   m_Layer: 0
   m_Name: Main Camera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &330585544
 AudioListener:
   m_ObjectHideFlags: 0
@@ -557,17 +557,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f32d222886de2941bc5649c7056694c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveTime: 0.5
-  moveSpeed: 1
+  moveTime: 10
+  moveSpeed: 0.1
   newPosition: {x: 0, y: 0, z: 0}
   cameraPosition: {x: 0, y: 0, z: 0}
   cameraToWork: {fileID: 1801639725}
   rotationSpeed: 1
   rotationCamera: {x: 0, y: 0, z: 0, w: 0}
   zoomAmmount: {x: 0, y: 0, z: 0}
-  zoomMultiplay: 2
+  zoomMultiplay: 1
   currentMouseClick: {x: 0, y: 0, z: 0}
   clickMousePossition: {x: 0, y: 0, z: 0}
+  mouseScrollSpeed: 1
 --- !u!4 &1369373595
 Transform:
   m_ObjectHideFlags: 0
@@ -703,7 +704,7 @@ GameObject:
   - component: {fileID: 1801639726}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
