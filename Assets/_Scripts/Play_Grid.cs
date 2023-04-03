@@ -9,10 +9,14 @@ public class play_grid : MonoBehaviour
 {
     // Start is called before the first frame update
     [SerializeField] private bool _to_draw_Gizmos;
-    [SerializeField] const int _width = 50;
-    [SerializeField] const int _depth = 50;
+    [SerializeField] int _width;
+    [SerializeField] int _depth;
 
-    public Vector2Int GridSize = new Vector2Int(_width, _depth);
+    public GameObject _cell_to_fill;
+    public Gradient _cell_colors;
+    
+
+    public Vector2Int GridSize;
 
     private Building[,] grid;
     private Building flyingBuilding;
@@ -23,21 +27,26 @@ public class play_grid : MonoBehaviour
 
     private void Awake()
     {
+        _width = GridSize.x;
+        _depth = GridSize.y;
         grid = new Building[GridSize.x, GridSize.y];
         mainCamera = Camera.main;
     }
 
     private void Start()
     {
-        GameObject grid_holder = new GameObject();
-        grid_holder.name = "Game_grid";
+        GameObject _cell;
+        //GameObject grid_holder = new GameObject();
+        //grid_holder.name = "Game_grid";
         for (int x = 0; x < _width; x++)
             for (int z = 0; z < _depth; z++)
             {
-                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cube.transform.position = new Vector3(x, -0.05f, z);
-                cube.transform.localScale = new Vector3(0.9f, 0.1f, 0.9f);
-                cube.transform.parent = grid_holder.transform;
+                _cell = Instantiate(_cell_to_fill, new Vector3(x, 0, z), new Quaternion(0,0,0,0) ,this.transform);
+                String _name = "x" + x.ToString() + "_y" + z.ToString();
+                _cell.name = _name;
+                //ScriptableObject s = _cell_to_fill.GetComponent<ScriptableObject>();
+                //_cell_to_fill.transform.position = new Vector3(x, 0, z);
+                //_cell_to_fill.transform.parent = grid_holder.transform;
             }
     }
 
