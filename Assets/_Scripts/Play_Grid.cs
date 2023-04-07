@@ -9,8 +9,6 @@ public class play_grid : MonoBehaviour
 {
     // Start is called before the first frame update
     [SerializeField] private bool _to_draw_Gizmos;
-    [SerializeField] int _width;
-    [SerializeField] int _depth;
 
     public GameObject _cell_to_fill;
     public Gradient _cell_colors;
@@ -18,36 +16,98 @@ public class play_grid : MonoBehaviour
 
     public Vector2Int GridSize;
 
+    public float _distance;
+
     private Building[,] grid;
+    private GameObject[,] _to_grid;
+
     private Building flyingBuilding;
     private Camera mainCamera;
 
     private GameObject[,] _PlayingGrid;
+    
+    public float _min_dist, _max_dist;
+    public float _min_ion, _max_ion;
 
+    public float[][,] _education_fild;
 
-    private void Awake()
+    private void GridUpdate()
     {
-        _width = GridSize.x;
-        _depth = GridSize.y;
+        GameObject[] _People_to_find;
+        _People_to_find = GameObject.FindGameObjectsWithTag("People");
+  
+        float _dist ;
+        float _ion ;
+
+       
+        _min_dist = 10000f;
+        _max_dist = 0f;
+        _min_ion = 10000f;
+        _max_ion = 0f;
+        
+        
+        for (int x = 0; x < GridSize.x; x++)
+            for (int y = 0; y < GridSize.y; y++)
+            {
+                _dist = 0f;
+                _ion = 0f;
+
+                
+                for (int i = 0; i < _People_to_find.Length; i++)
+                {
+                    float _prom = Vector3.Distance(_to_grid[x, y].transform.position, _People_to_find[i].transform.position);
+                    _dist += Mathf.Abs(_prom);
+                    if (_prom > 0.01)
+                        _ion += Mathf.Log(_prom, 10);
+                    else
+                        _ion += 0;
+                }
+
+                if (_ion < 0)
+                    _ion = 0;
+
+                if (_max_dist < _dist)
+                    _max_dist = _dist;
+                if (_min_dist > _dist)
+                    _min_dist = _dist;
+                
+                if (_max_ion < _ion)
+                    _max_ion = _ion;
+                if (_min_ion > _ion)
+                    _min_ion = _ion;
+                
+                _to_grid[x, y].GetComponent<game_cell_script>()._total_dist = _dist;
+                _to_grid[x, y].GetComponent<game_cell_script>()._ion = _ion;
+                _to_grid[x, y].GetComponent<game_cell_script>()._color = _dist ;
+            }
+    }
+
+        private void Awake()
+    {
         grid = new Building[GridSize.x, GridSize.y];
+        _to_grid = new GameObject[GridSize.x, GridSize.y];
+        _education_fild = new float[][,] {
+            new float[GridSize.x, GridSize.y],
+            new float[GridSize.x, GridSize.y],
+            new float[GridSize.x, GridSize.y]
+        };
+        
         mainCamera = Camera.main;
     }
 
     private void Start()
     {
         GameObject _cell;
-        //GameObject grid_holder = new GameObject();
-        //grid_holder.name = "Game_grid";
-        for (int x = 0; x < _width; x++)
-            for (int z = 0; z < _depth; z++)
+
+        for (int x = 0; x < GridSize.x; x++)
+            for (int z = 0; z < GridSize.y; z++)
             {
                 _cell = Instantiate(_cell_to_fill, new Vector3(x, 0, z), new Quaternion(0,0,0,0) ,this.transform);
                 String _name = "x" + x.ToString() + "_y" + z.ToString();
-                _cell.name = _name;
-                //ScriptableObject s = _cell_to_fill.GetComponent<ScriptableObject>();
-                //_cell_to_fill.transform.position = new Vector3(x, 0, z);
-                //_cell_to_fill.transform.parent = grid_holder.transform;
+                _to_grid[x, z] = _cell;
+                _to_grid[x,z].name = _name;
             }
+        //GridUpdate();
     }
 
     public void StartPlacingBuilding(Building buildingPrefab)
@@ -58,6 +118,10 @@ public class play_grid : MonoBehaviour
         }
 
         flyingBuilding = Instantiate(buildingPrefab);
+        Animator flying_persot = flyingBuilding.GetComponentInChildren<Animator>();
+        flying_persot.SetBool("Trowing",true);
+        print("Throw_person");
+        
     }
 
     private void Update()
@@ -90,6 +154,9 @@ public class play_grid : MonoBehaviour
                 }
             }
         }
+        
+        GridUpdate();
+        
     }
 
     private bool IsPlaceTaken(int placeX, int placeY)
@@ -114,9 +181,14 @@ public class play_grid : MonoBehaviour
                 grid[placeX + x, placeY + y] = flyingBuilding;
             }
         }
-
+        Animator flying_persot = flyingBuilding.GetComponentInChildren<Animator>();
+        flying_persot.SetBool("Trowing",false);
+        print("Throw_person_out");
+        
         flyingBuilding.SetNormal();
         flyingBuilding = null;
+        
+
     }
 
 
@@ -131,8 +203,8 @@ public class play_grid : MonoBehaviour
 
         IEnumerable<Vector3> EvaluateGridPoints()
         {
-            for (int x = 0; x < _width; x++)
-            for (int z = 0; z < _depth; z++)
+            for (int x = 0; x < GridSize.x; x++)
+            for (int z = 0; z < GridSize.y; z++)
             {
                 yield return new Vector3(x, 0, z);
             }

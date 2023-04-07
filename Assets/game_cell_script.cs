@@ -13,6 +13,15 @@ public class game_cell_script : MonoBehaviour
     public GameObject _parrant_grid;
     public Vector2 _grid_size;
     
+    public float _p_ion;
+    public float _p_dist;
+
+    public Vector2 _pos;
+
+    public float _color;
+    public float _ion;
+    public float _total_dist;
+    
     // Start is called before the first frame update
     void Start()
     {
@@ -25,36 +34,23 @@ public class game_cell_script : MonoBehaviour
         _parrant_grid = GameObject.Find("GRID");
         
         _grid_size = _parrant_grid.GetComponent<play_grid>().GridSize;
+        //_max_dist = _parrant_grid.GetComponent<play_grid>()._distance;
         // Update is called once per frame
     }
 
     void Update()
     {
-        GameObject[] _People_to_find;
-        _People_to_find = GameObject.FindGameObjectsWithTag("People");
-  
-        //float _max_dist = Mathf.Sqrt(Mathf.Pow(_grid_size.x , 2f) + Mathf.Pow(_grid_size.y, 2f));
-
-        float _max_dist = 50f;
+        if (_parent_play._max_dist != 0)
+            _mesh_renderer.material.color = _color_to_fill.Evaluate(_color / _parent_play._max_dist);
+        else
+            _mesh_renderer.material.color = _color_to_fill.Evaluate(0);
         
-        float _dist = 0f;
-        for (int i = 0; i < _People_to_find.Length; i++)
+        if (_ion != null)
         {
-            _dist += Vector3.Distance(this.transform.position, _People_to_find[i].transform.position);
+            Vector3 _pos = this.transform.position;
+            if (_parent_play._max_ion != 0)
+                _pos.y = 0 - 10 * (_ion - _parent_play._min_ion);
+            this.transform.position = _pos;
         }
-
-        float _color = 0.0f;
-        if (_People_to_find.Length > 0)
-        {
-            _color = _dist / _max_dist / _People_to_find.Length;
-        }
-
-        //_color = Mathf.Lerp(0f, _max_dist, _dist);
-        _mesh_renderer.material.color = _color_to_fill.Evaluate(_color);
     }
-
-    //float GetDistance(GameObject)
-    //{
-    //    
-    //}
 }
